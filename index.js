@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 import postRouter from './routers/postRouter.js';
 import authRouter from './routers/authRouter.js';
 
-dots.config({ path: './env/.env' });
+dots.config();
 
 const app = express();
 app.use(cors());
