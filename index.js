@@ -26,7 +26,7 @@ const mongooseSet = {
 
 app.get('/', (req, res) => {
 	res.json({
-		messenge: 'Проверка успешна',
+		messenge: 'Hello',
 	});
 });
 
