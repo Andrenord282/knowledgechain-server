@@ -15,8 +15,22 @@ class JwtServices {
 		};
 	};
 
-	validateJWT = (token) => {
-		return jwt.verify(token, this.JWT_SECRET);
+	validateRefreshToken(token) {
+		try {
+			const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+			return userData;
+		} catch (e) {
+			return null;
+		}
+	}
+
+	searchToken = async (token) => {
+		try {
+			const tokenData = await tokenModel.findOne({ token });
+			return tokenData;
+		} catch (error) {
+			console.log('Рефреш токен в базе не найден');
+		}
 	};
 
 	saveRefreshJWT = async (idUser, refreshToken) => {

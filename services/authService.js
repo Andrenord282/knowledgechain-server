@@ -43,17 +43,11 @@ class AuthServices {
 			const userDto = new UserDto(user);
 			const tokens = jwtServices.generateJWT({ ...userDto });
 			await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
-			return { status: true, user: { ...userDto, ...tokens } };
+			return { ...userDto, ...tokens };
 		} catch (error) {
 			console.log(error.message);
 			return { status: false };
 		}
-	};
-
-	authentication = async (req) => {
-		const token = req.headers.authorization;
-		const user = validateJWT(token);
-		console.log();
 	};
 
 	logOut = async (req) => {
@@ -62,6 +56,20 @@ class AuthServices {
 		try {
 		} catch (error) {}
 	};
+
+	async refresh(refreshToken) {
+		const userData = jwtServices.validateRefreshToken(refreshToken);
+		const token = await jwtServices.searchToken(refreshToken);
+		if (!userData || !token) {
+			console.log('Рефрешь токена не сработал');
+		}
+		const user = await UserModel.findById(userData.id);
+		const userDto = new UserDto(user);
+		const tokens = jwtServices.generateJWT({ ...userDto });
+		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+
+		return { ...userDto, ...tokens };
+	}
 }
 
 export default new AuthServices();

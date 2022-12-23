@@ -17,15 +17,16 @@ class AuthController {
 			});
 		}
 	};
+
 	logIn = async (req, res) => {
 		try {
 			const logInUser = await authService.logIn(req);
-			console.log(logInUser);
-			res.cookie('refreshToken', logInUser.user.refreshToken, {
+			res.cookie('refreshToken', logInUser.refreshToken, {
 				maxAge: 30 * 24 * 60 * 60 * 1000,
 				httpOnly: true,
 			});
-			res.status(200).json(logInUser);
+			const { refreshToken, ...dataUser } = logInUser;
+			res.status(200).json({...dataUser});
 		} catch (err) {
 			console.log(err);
 			res.status(500).json({
@@ -45,6 +46,16 @@ class AuthController {
 				message: 'Ошибка',
 			});
 		}
+	};
+
+	refresh = async (req, res) => {
+		const { refreshToken } = req.cookies;
+		const refreshUser = await authService.refresh(refreshToken);
+		res.cookie('refreshToken', registationUser.refreshToken, {
+			maxAge: 30 * 24 * 60 * 60 * 1000,
+			httpOnly: true,
+		});
+		res.status(200).json({ ...refreshUser });
 	};
 }
 
