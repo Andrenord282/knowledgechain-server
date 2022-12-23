@@ -58,6 +58,7 @@ class AuthServices {
 	};
 
 	async refresh(refreshToken) {
+		console.log(refreshToken);
 		const userData = jwtServices.validateRefreshToken(refreshToken);
 		const token = await jwtServices.searchToken(refreshToken);
 		if (!userData || !token) {
