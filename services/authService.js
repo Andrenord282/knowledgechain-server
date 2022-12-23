@@ -19,12 +19,12 @@ class AuthServices {
 			const tokens = jwtServices.generateJWT({ ...userDto });
 			await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
 
-			return { status: true, user: { ...userDto, ...tokens } };
+			return { ...userDto, ...tokens };
 		} catch (error) {
 			console.log(error.message);
-			return { status: false };
 		}
 	};
+
 	logIn = async (req) => {
 		try {
 			const { email, password } = req.body;
