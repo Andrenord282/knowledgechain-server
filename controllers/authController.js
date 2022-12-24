@@ -21,12 +21,15 @@ class AuthController {
 	logIn = async (req, res) => {
 		try {
 			const logInUser = await authService.logIn(req);
+			console.log(logInUser.refreshToken);
 			res.cookie('refreshToken', logInUser.refreshToken, {
 				maxAge: 30 * 24 * 60 * 60 * 1000,
 				httpOnly: true,
 			});
+			console.log(req);
+
 			const { refreshToken, ...dataUser } = logInUser;
-			res.status(200).json({...dataUser});
+			res.status(200).json({ ...dataUser });
 		} catch (err) {
 			console.log(err);
 			res.status(500).json({
@@ -51,10 +54,12 @@ class AuthController {
 	refresh = async (req, res) => {
 		const { refreshToken } = req.cookies;
 		const refreshUser = await authService.refresh(refreshToken);
-		res.cookie('refreshToken', registationUser.refreshToken, {
+		res.cookie('refreshToken', refreshUser.refreshToken, {
 			maxAge: 30 * 24 * 60 * 60 * 1000,
 			httpOnly: true,
 		});
+
+		delete refreshUser.refreshToken;
 		res.status(200).json({ ...refreshUser });
 	};
 }

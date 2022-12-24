@@ -4,7 +4,7 @@ import tokenModel from '../models/Token.js';
 class JwtServices {
 	generateJWT = (data) => {
 		const accessToken = jwt.sign(data, process.env.ACCESS_JWT_SECRET, {
-			expiresIn: '30m',
+			expiresIn: '2d',
 		});
 		const refreshToken = jwt.sign(data, process.env.REFRESH_JWT_SECRET, {
 			expiresIn: '30d',
@@ -17,7 +17,7 @@ class JwtServices {
 
 	validateRefreshToken(token) {
 		try {
-			const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+			const userData = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
 			return userData;
 		} catch (e) {
 			return null;

@@ -10,13 +10,13 @@ import authRouter from './routers/authRouter.js';
 dots.config();
 
 const app = express();
+app.use(cookieParser());
 app.use(
 	cors({
 		credentials: true,
-		origin: '*',
+		origin: 'https://knowledgechain-app.vercel.app/',
 	}),
 );
-app.use(cookieParser());
 app.use(express.json());
 app.use('/', postRouter);
 app.use('/auth', authRouter);

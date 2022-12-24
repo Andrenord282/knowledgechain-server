@@ -7,7 +7,6 @@ class AuthServices {
 	registration = async (req) => {
 		try {
 			const { email, userName, password } = req.body;
-
 			const hachingPassword = await passwordService.encrypt(password);
 			const user = await UserModel.create({
 				email,
@@ -21,7 +20,7 @@ class AuthServices {
 
 			return { ...userDto, ...tokens };
 		} catch (error) {
-			console.log(error.message);
+			console.log('ошибка ' + error.message);
 		}
 	};
 
@@ -41,7 +40,9 @@ class AuthServices {
 				return { status: false };
 			}
 			const userDto = new UserDto(user);
+
 			const tokens = jwtServices.generateJWT({ ...userDto });
+
 			await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
 			return { ...userDto, ...tokens };
 		} catch (error) {
@@ -61,6 +62,7 @@ class AuthServices {
 		console.log(refreshToken);
 		const userData = jwtServices.validateRefreshToken(refreshToken);
 		const token = await jwtServices.searchToken(refreshToken);
+		console.log('user ' + userData);
 		if (!userData || !token) {
 			console.log('Рефрешь токена не сработал');
 		}
