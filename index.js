@@ -2,7 +2,9 @@ import dots from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import configCros from './utilities/configCros.js';
 import cookieParser from 'cookie-parser';
+import errorMiddleware from './middlewares/errorMiddleware.js';
 
 import postRouter from './routers/postRouter.js';
 import authRouter from './routers/authRouter.js';
@@ -11,15 +13,11 @@ dots.config();
 
 const app = express();
 app.use(cookieParser());
-app.use(
-	cors({
-		credentials: true,
-		origin: 'https://knowledgechain-app.vercel.app/',
-	}),
-);
+app.use(cors(configCros));
 app.use(express.json());
 app.use('/', postRouter);
 app.use('/auth', authRouter);
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
 const DB_HOST = process.env.DB_HOST;

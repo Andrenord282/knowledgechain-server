@@ -4,7 +4,7 @@ import tokenModel from '../models/Token.js';
 class JwtServices {
 	generateJWT = (data) => {
 		const accessToken = jwt.sign(data, process.env.ACCESS_JWT_SECRET, {
-			expiresIn: '2d',
+			expiresIn: '1d',
 		});
 		const refreshToken = jwt.sign(data, process.env.REFRESH_JWT_SECRET, {
 			expiresIn: '30d',
@@ -24,9 +24,9 @@ class JwtServices {
 		}
 	}
 
-	searchToken = async (token) => {
+	searchToken = async (refreshToken) => {
 		try {
-			const tokenData = await tokenModel.findOne({ token });
+			const tokenData = await tokenModel.findOne({ refreshToken });
 			return tokenData;
 		} catch (error) {
 			console.log('Рефреш токен в базе не найден');
@@ -46,8 +46,8 @@ class JwtServices {
 		return token;
 	};
 
-	removeToken = async (token) => {
-		await tokenModel.deleteOne({ refreshToken: token });
+	removeToken = async (refreshToken) => {
+		await tokenModel.deleteOne({ refreshToken });
 	};
 }
 

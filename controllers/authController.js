@@ -1,7 +1,7 @@
 import authService from '../services/authService.js';
 
 class AuthController {
-	registation = async (req, res) => {
+	registation = async (req, res, next) => {
 		try {
 			const registationUser = await authService.registration(req);
 			res.cookie('refreshToken', registationUser.refreshToken, {
@@ -9,58 +9,50 @@ class AuthController {
 				httpOnly: true,
 			});
 			const { refreshToken, ...dataUser } = registationUser;
-			res.status(200).json({ ...dataUser });
-		} catch (err) {
-			console.log(err);
-			res.status(500).json({
-				message: 'Не удалось зарегестрировать',
-			});
+			res.json(dataUser);
+		} catch (error) {
+			next(error);
 		}
 	};
 
-	logIn = async (req, res) => {
+	logIn = async (req, res, next) => {
 		try {
 			const logInUser = await authService.logIn(req);
-			console.log(logInUser.refreshToken);
 			res.cookie('refreshToken', logInUser.refreshToken, {
 				maxAge: 30 * 24 * 60 * 60 * 1000,
 				httpOnly: true,
 			});
-			console.log(req);
-
 			const { refreshToken, ...dataUser } = logInUser;
-			res.status(200).json({ ...dataUser });
-		} catch (err) {
-			console.log(err);
-			res.status(500).json({
-				message: 'Не удалось зарегестрировать',
-			});
+			res.status(200).json(dataUser);
+		} catch (error) {
+			next(error);
 		}
 	};
-	logOut = async (req, res) => {
+	logOut = async (req, res, next) => {
 		try {
 			const { refreshToken } = req.cookies;
-			const logOutUser = await authService.logOut(refreshToken);
+			await authService.logOut(refreshToken);
 			res.clearCookie('refreshToken');
-			return res.json(logOutUser);
-		} catch (err) {
-			console.log(err);
-			res.status(500).json({
-				message: 'Ошибка',
-			});
+			return res.status(200).json({ message: 'Пользователь вышел' });
+		} catch (error) {
+			next(error);
 		}
 	};
 
-	refresh = async (req, res) => {
-		const { refreshToken } = req.cookies;
-		const refreshUser = await authService.refresh(refreshToken);
-		res.cookie('refreshToken', refreshUser.refreshToken, {
-			maxAge: 30 * 24 * 60 * 60 * 1000,
-			httpOnly: true,
-		});
+	refresh = async (req, res, next) => {
+		try {
+			const { refreshToken } = req.cookies;
+			const refreshUser = await authService.refresh(refreshToken);
+			res.cookie('refreshToken', refreshUser.refreshToken, {
+				maxAge: 30 * 24 * 60 * 60 * 1000,
+				httpOnly: true,
+			});
 
-		delete refreshUser.refreshToken;
-		res.status(200).json({ ...refreshUser });
+			delete refreshUser.refreshToken;
+			res.status(200).json(refreshUser);
+		} catch (error) {
+			next(error);
+		}
 	};
 }
 

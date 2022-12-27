@@ -2,69 +2,75 @@ import UserModel from '../models/User.js';
 import passwordService from './passwordService.js';
 import jwtServices from './jwtService.js';
 import UserDto from '../dto/user.js';
+import ErrorService from './errorService.js';
 
 class AuthServices {
 	registration = async (req) => {
-		try {
-			const { email, userName, password } = req.body;
-			const hachingPassword = await passwordService.encrypt(password);
-			const user = await UserModel.create({
-				email,
-				userName,
-				passwordHashed: hachingPassword,
-			});
-
-			const userDto = new UserDto(user);
-			const tokens = jwtServices.generateJWT({ ...userDto });
-			await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
-
-			return { ...userDto, ...tokens };
-		} catch (error) {
-			console.log('ошибка ' + error.message);
+		const { email, userName, password } = req.body;
+		const userExists = await UserModel.findOne({ email });
+		if (userExists) {
+			throw ErrorService.BadRequest(
+				'ErrorUser',
+				'Пользователь с таким email уже существует',
+			);
 		}
+
+		const hachingPassword = await passwordService.encrypt(password);
+		const user = await UserModel.create({
+			email,
+			userName,
+			passwordHashed: hachingPassword,
+		});
+		const userDto = new UserDto(user);
+		const tokens = jwtServices.generateJWT({ ...userDto });
+		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+
+		return { ...userDto, ...tokens };
 	};
 
 	logIn = async (req) => {
-		try {
-			const { email, password } = req.body;
-			const user = await UserModel.findOne({ email });
-			if (!user) {
-				return { status: false };
-			}
-			const checkPassword = await passwordService.check(
-				password,
-				user.passwordHashed,
+		const { email, password } = req.body;
+		const user = await UserModel.findOne({ email });
+		if (!user) {
+			throw ErrorService.BadRequest(
+				'ErrorUser',
+				'Пользователь не найден',
 			);
-
-			if (!checkPassword) {
-				return { status: false };
-			}
-			const userDto = new UserDto(user);
-
-			const tokens = jwtServices.generateJWT({ ...userDto });
-
-			await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
-			return { ...userDto, ...tokens };
-		} catch (error) {
-			console.log(error.message);
-			return { status: false };
 		}
+		const checkPassword = await passwordService.check(
+			password,
+			user.passwordHashed,
+		);
+		if (!checkPassword) {
+			throw ErrorService.BadRequest('ErrorUser', 'Неверная почта или пароль');
+		}
+		const userDto = new UserDto(user);
+		const tokens = jwtServices.generateJWT({ ...userDto });
+		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+
+		return { ...userDto, ...tokens };
 	};
 
 	logOut = async (req) => {
-		const deleteToken = await jwtServices.removeToken(req);
-		return deleteToken;
 		try {
-		} catch (error) {}
+			const deleteToken = await jwtServices.removeToken(req);
+			return deleteToken;
+		} catch (error) {
+			throw ErrorService.BadRequest(
+				'ErrorUser',
+				'Не удалось удалить токен при выходе с учетной записи',
+			);
+		}
 	};
 
 	async refresh(refreshToken) {
-		console.log(refreshToken);
 		const userData = jwtServices.validateRefreshToken(refreshToken);
 		const token = await jwtServices.searchToken(refreshToken);
-		console.log('user ' + userData);
 		if (!userData || !token) {
-			console.log('Рефрешь токена не сработал');
+			throw ErrorService.BadRequest(
+				'ErrorUser',
+				'Токен не прошел валидацию или токен не найден',
+			);
 		}
 		const user = await UserModel.findById(userData.id);
 		const userDto = new UserDto(user);
