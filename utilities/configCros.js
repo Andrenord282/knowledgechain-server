@@ -1,14 +1,11 @@
-const originsCros = [
-	'https://knowledgechain-app.vercel.app',
-	'http://localhost:3000',
-];
+import crosList from './crosList.js';
 
 const configCros = {
 	origin: (origin, callback) => {
-		if (originsCros.includes(origin)) {
+		if (crosList.includes(origin)) {
 			callback(null, true);
 		} else {
-			callback(new Error('Not allowed by CORS'));
+			callback(new Error(`CORS не разрешеный origin: ${origin}`));
 		}
 	},
 	optionsSuccessStatus: 200,
