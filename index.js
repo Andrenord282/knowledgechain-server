@@ -4,18 +4,24 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import configCros from './utilities/configCros.js';
 import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
+import formData from 'express-form-data';
 import errorMiddleware from './middlewares/errorMiddleware.js';
-
 import postRouter from './routers/postRouter.js';
+import uploadsRouter from './routers/uploadsRouter.js'
 import authRouter from './routers/authRouter.js';
 
 dots.config();
 
 const app = express();
-app.use(cookieParser());
 app.use(cors(configCros));
-app.use(express.json());
-app.use('/', postRouter);
+app.use(express.static(`public`));
+app.use(express.json({ limit: '50mb' }));
+app.use(cookieParser());
+app.use(fileUpload());
+// app.use(formData.parse());
+app.use(express.urlencoded({ limit: '50mb' }));
+app.use('/', postRouter, uploadsRouter);
 app.use('/auth', authRouter);
 app.use(errorMiddleware);
 

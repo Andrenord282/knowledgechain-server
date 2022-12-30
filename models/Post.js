@@ -4,9 +4,18 @@ import { Schema } from 'mongoose';
 const PostSchema = Schema(
 	{
 		author: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User',
+			type: String,
 			require: true,
+		},
+		postId: {
+			type: String,
+			require: true,
+			unique: true,
+		},
+		postName: {
+			type: String,
+			require: true,
+			unique: true,
 		},
 		schemePost: {
 			type: Array,

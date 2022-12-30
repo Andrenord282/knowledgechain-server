@@ -1,15 +1,9 @@
 import { Router } from 'express';
-import { createPost, getPosts } from '../controllers/postControllers.js';
+import postsController from '../controllers/postsController.js';
 const router = new Router();
 
-router.get('/posts', getPosts);
-
-router.get('/post/:id', (req, res) => {
-	res.json({
-		messenge: 'Проверка успешна',
-	});
-});
-
-router.post('/post', createPost);
+router.get('/posts');
+router.get('/posts/:id');
+router.post('/posts', postsController.createPost);
 
 export default router;

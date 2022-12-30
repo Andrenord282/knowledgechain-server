@@ -23,7 +23,7 @@ class AuthController {
 				httpOnly: true,
 			});
 			const { refreshToken, ...dataUser } = logInUser;
-			res.status(200).json(dataUser);
+			res.json(dataUser);
 		} catch (error) {
 			next(error);
 		}
@@ -33,7 +33,7 @@ class AuthController {
 			const { refreshToken } = req.cookies;
 			await authService.logOut(refreshToken);
 			res.clearCookie('refreshToken');
-			return res.status(200).json({ message: 'Пользователь вышел' });
+			return res.json({ message: 'Пользователь вышел' });
 		} catch (error) {
 			next(error);
 		}
@@ -49,7 +49,7 @@ class AuthController {
 			});
 
 			delete refreshUser.refreshToken;
-			res.status(200).json(refreshUser);
+			res.json(refreshUser);
 		} catch (error) {
 			next(error);
 		}

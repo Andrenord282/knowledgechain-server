@@ -10,7 +10,7 @@ class AuthServices {
 		const userExists = await UserModel.findOne({ email });
 		if (userExists) {
 			throw ErrorService.BadRequest(
-				'ErrorUser',
+				'UserError',
 				'Пользователь с таким email уже существует',
 			);
 		}
@@ -33,7 +33,7 @@ class AuthServices {
 		const user = await UserModel.findOne({ email });
 		if (!user) {
 			throw ErrorService.BadRequest(
-				'ErrorUser',
+				'UserError',
 				'Пользователь не найден',
 			);
 		}
@@ -42,7 +42,7 @@ class AuthServices {
 			user.passwordHashed,
 		);
 		if (!checkPassword) {
-			throw ErrorService.BadRequest('ErrorUser', 'Неверная почта или пароль');
+			throw ErrorService.BadRequest('UserError', 'Неверная почта или пароль');
 		}
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
@@ -57,7 +57,7 @@ class AuthServices {
 			return deleteToken;
 		} catch (error) {
 			throw ErrorService.BadRequest(
-				'ErrorUser',
+				'UserError',
 				'Не удалось удалить токен при выходе с учетной записи',
 			);
 		}
@@ -68,11 +68,11 @@ class AuthServices {
 		const token = await jwtServices.searchToken(refreshToken);
 		if (!userData || !token) {
 			throw ErrorService.BadRequest(
-				'ErrorUser',
+				'UserError',
 				'Токен не прошел валидацию или токен не найден',
 			);
 		}
-		const user = await UserModel.findById(userData.id);
+		const user = await UserModel.findById(userData.userId);
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
 		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);

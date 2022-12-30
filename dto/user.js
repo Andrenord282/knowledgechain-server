@@ -1,11 +1,11 @@
 class UserDto {
-	id;
+	userId;
 	userName;
 	email;
 	userImgUrl;
 
 	constructor(model) {
-		this.id = model._id;
+		this.userId = model._id;
 		this.userName = model.userName;
 		this.email = model.email;
 		this.userImgUrl = model.userImgUrl;
