@@ -2,8 +2,9 @@ import { Router } from 'express';
 import postsController from '../controllers/postsController.js';
 const router = new Router();
 
-router.get('/posts');
+router.get('/posts', postsController.getPosts);
 router.get('/posts/:id');
 router.post('/posts', postsController.createPost);
+router.post('/mark', postsController.markPost);
 
 export default router;

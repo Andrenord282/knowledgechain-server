@@ -1,4 +1,5 @@
 import UserModel from '../models/User.js';
+import UserActivityModel from '../models/UserActivity.js';
 import passwordService from './passwordService.js';
 import jwtServices from './jwtService.js';
 import UserDto from '../dto/user.js';
@@ -9,10 +10,7 @@ class AuthServices {
 		const { email, userName, password } = req.body;
 		const userExists = await UserModel.findOne({ email });
 		if (userExists) {
-			throw ErrorService.BadRequest(
-				'UserError',
-				'Пользователь с таким email уже существует',
-			);
+			throw ErrorService.BadRequest('UserError', 'Пользователь с таким email уже существует');
 		}
 
 		const hachingPassword = await passwordService.encrypt(password);
@@ -20,6 +18,9 @@ class AuthServices {
 			email,
 			userName,
 			passwordHashed: hachingPassword,
+		});
+		await UserActivityModel.create({
+			user: user._id,
 		});
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
@@ -32,15 +33,9 @@ class AuthServices {
 		const { email, password } = req.body;
 		const user = await UserModel.findOne({ email });
 		if (!user) {
-			throw ErrorService.BadRequest(
-				'UserError',
-				'Пользователь не найден',
-			);
+			throw ErrorService.BadRequest('UserError', 'Пользователь не найден');
 		}
-		const checkPassword = await passwordService.check(
-			password,
-			user.passwordHashed,
-		);
+		const checkPassword = await passwordService.check(password, user.passwordHashed);
 		if (!checkPassword) {
 			throw ErrorService.BadRequest('UserError', 'Неверная почта или пароль');
 		}
@@ -72,7 +67,8 @@ class AuthServices {
 				'Токен не прошел валидацию или токен не найден',
 			);
 		}
-		const user = await UserModel.findById(userData.userId);
+		console.log(userData);
+		const user = await UserModel.findById(userData.idUser);
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
 		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);

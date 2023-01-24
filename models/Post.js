@@ -17,7 +17,12 @@ const PostSchema = Schema(
 			require: true,
 			unique: true,
 		},
-		schemePost: {
+		schemaPost: {
+			type: Array,
+			default: [],
+			require: true,
+		},
+		themesPost: {
 			type: Array,
 			default: [],
 			require: true,
