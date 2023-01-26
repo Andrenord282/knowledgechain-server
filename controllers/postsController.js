@@ -19,6 +19,15 @@ class PostsController {
 		}
 	};
 
+	userActivityPosts = async (req, res, next) => {
+		try {
+			const activity = await postsService.userActivityPosts(req.query);
+			res.json(activity);
+		} catch (error) {
+			next(error);
+		}
+	};
+
 	markPost = async (req, res, next) => {
 		try {
 			const postList = await postsService.markPost(req.body);

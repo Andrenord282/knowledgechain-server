@@ -20,11 +20,11 @@ class AuthServices {
 			passwordHashed: hachingPassword,
 		});
 		await UserActivityModel.create({
-			user: user._id,
+			idUser: user._id,
 		});
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
-		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+		await jwtServices.saveRefreshJWT(userDto.idUser, tokens.refreshToken);
 
 		return { ...userDto, ...tokens };
 	};
@@ -41,7 +41,7 @@ class AuthServices {
 		}
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
-		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+		await jwtServices.saveRefreshJWT(userDto.idUser, tokens.refreshToken);
 
 		return { ...userDto, ...tokens };
 	};
@@ -67,11 +67,12 @@ class AuthServices {
 				'Токен не прошел валидацию или токен не найден',
 			);
 		}
-		console.log(userData);
 		const user = await UserModel.findById(userData.idUser);
+
 		const userDto = new UserDto(user);
 		const tokens = jwtServices.generateJWT({ ...userDto });
-		await jwtServices.saveRefreshJWT(userDto.id, tokens.refreshToken);
+
+		await jwtServices.saveRefreshJWT(userDto.idUser, tokens.refreshToken);
 
 		return { ...userDto, ...tokens };
 	}

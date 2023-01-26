@@ -8,12 +8,12 @@ import fileUpload from 'express-fileupload';
 import formData from 'express-form-data';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 import postRouter from './routers/postRouter.js';
-import uploadsRouter from './routers/uploadsRouter.js'
+import uploadsRouter from './routers/uploadsRouter.js';
 import searchRouter from './routers/searchRouter.js';
 import authRouter from './routers/authRouter.js';
+import userActivityPostsRouter from './routers/userActivityPostsRouter.js';
 
 dots.config();
-
 const app = express();
 app.use(cors(configCros));
 app.use(express.static(`public`));
@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(fileUpload());
 // app.use(formData.parse());
 app.use(express.urlencoded({ limit: '50mb' }));
-app.use('/', postRouter, uploadsRouter, searchRouter);
+app.use('/', postRouter, uploadsRouter, searchRouter, userActivityPostsRouter);
 app.use('/auth', authRouter);
 app.use(errorMiddleware);
 

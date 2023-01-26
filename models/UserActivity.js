@@ -1,25 +1,25 @@
 import { Schema, model } from 'mongoose';
 
 const UserActivitySchema = new Schema({
-	user: {
+	idUser: {
 		type: Schema.Types.ObjectId,
 		ref: 'User',
 		require: true,
 	},
+	title: {
+		type: String,
+	},
 	postRatings: {
 		type: Object,
-		require: true,
 		default: {},
 	},
 	viewedPosts: {
 		type: Object,
-		require: true,
 		default: {},
 	},
 	markedPosts: {
-		type: Object,
-		require: true,
-		default: {},
+		// type: Object,
+		// default: {},
 	},
 });
 

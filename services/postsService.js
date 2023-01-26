@@ -1,7 +1,7 @@
 import PostModel from '../models/Post.js';
 import UserActivityModel from '../models/UserActivity.js';
-import MarkedPostModel from '../models/MarkedPost.js';
 import ThemesService from './themesService.js';
+import UserActivityPostsDto from '../dto/userActivityPosts.js';
 import ErrorService from './errorService.js';
 
 function randomInteger(min, max) {
@@ -80,11 +80,52 @@ class PostsService {
 		return paramsFind;
 	};
 
-	markPost = async (indexPost) => {
-		// const UserActivity = await UserActivityModel.find({
-		// 	user: idUser,
-		// });
-		console.log(indexPost);
+	userActivityPosts = async (option) => {
+		try {
+			const { idUser } = option;
+			const userActivityPosts = await UserActivityModel.findOne({ idUser: idUser });
+			const userActivityPostsDto = new UserActivityPostsDto(userActivityPosts);
+			return { ...userActivityPostsDto };
+		} catch (error) {
+			throw ErrorService.ErrorServer(
+				'SendError',
+				'Не удалось найти активность пользователя в постах',
+			);
+		}
+	};
+
+	markPost = async (data) => {
+		const { idUser, indexPost } = data;
+		const UserActivity = await UserActivityModel.findOne({
+			idUser: idUser,
+		});
+		if (!UserActivity) {
+			throw ErrorService.ErrorServer(
+				'SendError',
+				'Не удалось найти активность пользователя в постах',
+			);
+		}
+
+		if (UserActivity.markedPosts[indexPost] === undefined) {
+			const post = await PostModel.findOne({ _id: indexPost });
+
+			UserActivity.markedPosts = {
+				...UserActivity.markedPosts,
+				[indexPost]: {
+					ref: post._id,
+					isMarked: true,
+				},
+			};
+			UserActivity.save();
+			return;
+		}
+
+		if (UserActivity.markedPosts[indexPost] !== undefined) {
+			UserActivity.markedPosts[indexPost];
+
+			UserActivity.save();
+			return;
+		}
 	};
 }
 

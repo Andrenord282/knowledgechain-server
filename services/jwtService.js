@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import tokenModel from '../models/Token.js';
+import TokenModel from '../models/Token.js';
 
 class JwtServices {
 	generateJWT = (data) => {
@@ -18,7 +18,6 @@ class JwtServices {
 	validateRefreshToken(token) {
 		try {
 			const userData = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
-			console.log(userData);
 			return userData;
 		} catch (e) {
 			return null;
@@ -27,7 +26,7 @@ class JwtServices {
 
 	searchToken = async (refreshToken) => {
 		try {
-			const tokenData = await tokenModel.findOne({ refreshToken });
+			const tokenData = await TokenModel.findOne({ refreshToken });
 			return tokenData;
 		} catch (error) {
 			console.log('Рефреш токен в базе не найден');
@@ -35,21 +34,22 @@ class JwtServices {
 	};
 
 	saveRefreshJWT = async (idUser, refreshToken) => {
-		console.log(idUser);
-		const tokenData = await tokenModel.findOne({ user: idUser });
+		const tokenData = await TokenModel.findOne({ user: idUser });
 		if (tokenData) {
 			tokenData.refreshToken = refreshToken;
 			return tokenData.save();
 		}
-		const token = await tokenModel.create({
+		const token = await TokenModel.create({
 			user: idUser,
 			refreshToken,
 		});
+
+
 		return token;
 	};
 
 	removeToken = async (refreshToken) => {
-		await tokenModel.deleteOne({ refreshToken });
+		await TokenModel.deleteOne({ refreshToken });
 	};
 }
 
