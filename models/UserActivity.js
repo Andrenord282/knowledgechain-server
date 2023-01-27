@@ -6,10 +6,8 @@ const UserActivitySchema = new Schema({
 		ref: 'User',
 		require: true,
 	},
-	title: {
-		type: String,
-	},
-	postRatings: {
+
+	ratingPosts: {
 		type: Object,
 		default: {},
 	},
@@ -18,8 +16,8 @@ const UserActivitySchema = new Schema({
 		default: {},
 	},
 	markedPosts: {
-		// type: Object,
-		// default: {},
+		type: Object,
+		default: {},
 	},
 });
 

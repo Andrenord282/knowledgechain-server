@@ -13,8 +13,15 @@ class UserActivityPostsController {
 	markPost = async (req, res, next) => {
 		try {
 			const markPost = await userActivityPostsService.markPost(req.body);
-			console.log(markPost);
 			res.json(markPost);
+		} catch (error) {
+			next(error);
+		}
+	};
+	ratingPost = async (req, res, next) => {
+		try {
+			const ratingPost = await userActivityPostsService.ratingPost(req.body);
+			res.json(ratingPost);
 		} catch (error) {
 			next(error);
 		}
